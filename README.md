@@ -6,6 +6,8 @@
 
 Тестовое задание на позицию «Фронтенд-разработчик React».
 
+**Работающая версия:** https://ut0po4ek.github.io/message/
+
 <p>
   <img src="docs/screenshots/chat-telegram-light.webp" alt="Чат Telegram, светлая тема" width="49%">
   <img src="docs/screenshots/chat-whatsapp-dark.webp" alt="Чат WhatsApp, тёмная тема" width="49%">
