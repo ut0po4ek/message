@@ -1,0 +1,259 @@
+.screen {
+  position: relative;
+  display: grid;
+  min-height: 100%;
+  padding: 48px 16px;
+  overflow: hidden;
+  background: var(--login-bg);
+  place-items: center;
+  isolation: isolate;
+}
+
+.screen::before,
+.screen::after {
+  position: absolute;
+  z-index: -1;
+  width: 560px;
+  height: 560px;
+  border-radius: 50%;
+  background: var(--accent);
+  content: '';
+  filter: blur(120px);
+  opacity: 0.16;
+  transition: background-color 0.4s;
+}
+
+.screen::before {
+  top: -240px;
+  left: -160px;
+}
+
+.screen::after {
+  right: -200px;
+  bottom: -260px;
+  opacity: 0.1;
+}
+
+.card {
+  display: flex;
+  width: 100%;
+  max-width: 380px;
+  flex-direction: column;
+  align-items: center;
+  animation: rise 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.logo {
+  margin-bottom: 24px;
+  filter: drop-shadow(0 12px 28px rgb(0 0 0 / 18%));
+  animation: pop 0.5s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  margin: 8px 0 32px;
+  color: var(--text-secondary);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.subtitle a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.subtitle a:hover {
+  text-decoration: underline;
+}
+
+.form {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.field {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 54px;
+  padding: 18px 16px 6px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  outline: none;
+  background: var(--bg-app);
+  font-size: 16px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.input:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.input:focus {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.input:disabled {
+  opacity: 0.6;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--danger);
+  box-shadow: inset 0 0 0 1px var(--danger);
+}
+
+.withButton {
+  padding-right: 52px;
+}
+
+.label {
+  position: absolute;
+  top: 17px;
+  left: 17px;
+  color: var(--text-secondary);
+  pointer-events: none;
+  transform-origin: left top;
+  transition:
+    transform 0.15s,
+    color 0.15s;
+}
+
+.input:focus + .label,
+.input:not(:placeholder-shown) + .label {
+  transform: translateY(-10px) scale(0.75);
+}
+
+.input:focus + .label {
+  color: var(--accent);
+}
+
+.input[aria-invalid='true'] + .label {
+  color: var(--danger);
+}
+
+.inputButton {
+  position: absolute;
+  top: 7px;
+  right: 6px;
+  display: grid;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-secondary);
+  place-items: center;
+}
+
+.inputButton:hover {
+  background: var(--bg-hover);
+}
+
+.hint,
+.fieldError {
+  margin: 6px 4px 0;
+  font-size: 13px;
+}
+
+.hint {
+  color: var(--text-secondary);
+}
+
+.fieldError {
+  color: var(--danger);
+}
+
+.error {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--danger) 10%, transparent);
+  color: var(--danger);
+  font-size: 14px;
+  animation: shake 0.35s;
+}
+
+.error svg {
+  flex-shrink: 0;
+}
+
+.submit {
+  display: grid;
+  height: 54px;
+  margin-top: 6px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  place-items: center;
+  transition:
+    background-color 0.15s,
+    transform 0.1s;
+}
+
+.submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.submit:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid currentcolor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes pop {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes shake {
+  25% {
+    transform: translateX(-4px);
+  }
+
+  75% {
+    transform: translateX(4px);
+  }
+}

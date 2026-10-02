@@ -1,0 +1,98 @@
+.item {
+  display: flex;
+  width: 100%;
+  gap: 12px;
+  align-items: center;
+  padding: 9px;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  text-align: left;
+  transition: background-color 0.12s;
+}
+
+.item:hover {
+  background: var(--bg-hover);
+}
+
+.item[aria-current='true'] {
+  background: var(--bg-selected);
+  color: var(--text-selected);
+}
+
+.body {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.top,
+.bottom {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.title {
+  overflow: hidden;
+  flex: 1;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.time {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
+.status {
+  flex-shrink: 0;
+  color: var(--meta-read);
+}
+
+.preview {
+  overflow: hidden;
+  flex: 1;
+  color: var(--text-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview[data-empty] {
+  font-style: italic;
+}
+
+.badge {
+  min-width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  padding: 0 7px;
+  border-radius: 11px;
+  background: var(--accent);
+  color: var(--accent-contrast);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 22px;
+  text-align: center;
+  animation: pop 0.25s cubic-bezier(0.3, 1.6, 0.5, 1);
+}
+
+.item[aria-current='true'] :is(.time, .preview, .status) {
+  color: inherit;
+  opacity: 0.85;
+}
+
+:root[data-messenger='telegram'] .item[aria-current='true'] .badge {
+  background: #fff;
+  color: var(--accent);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+  }
+}

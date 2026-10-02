@@ -1,0 +1,143 @@
+.row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 2px;
+  padding-left: 7px;
+}
+
+.row[data-direction='outgoing'] {
+  align-items: flex-end;
+  padding-right: 7px;
+  padding-left: 0;
+}
+
+.row[data-group-start] {
+  margin-top: 8px;
+}
+
+.row[data-animate] {
+  animation: appear 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.1);
+}
+
+.row[data-direction='incoming'][data-animate] {
+  transform-origin: left bottom;
+}
+
+.row[data-direction='outgoing'][data-animate] {
+  transform-origin: right bottom;
+}
+
+.bubble {
+  --bubble-bg: var(--bubble-in);
+
+  position: relative;
+  max-width: min(480px, 85%);
+  padding: 6px 9px 7px 11px;
+  border-radius: var(--radius-bubble);
+  background: var(--bubble-bg);
+  color: var(--text);
+  filter: drop-shadow(0 1px 1px rgb(16 35 47 / 13%));
+  overflow-wrap: anywhere;
+}
+
+.row[data-direction='outgoing'] .bubble {
+  --bubble-bg: var(--bubble-out);
+
+  color: var(--bubble-out-text);
+}
+
+.row[data-direction='incoming'] .bubble[data-tail] {
+  border-bottom-left-radius: 0;
+}
+
+.row[data-direction='outgoing'] .bubble[data-tail] {
+  border-bottom-right-radius: 0;
+}
+
+.text {
+  white-space: pre-wrap;
+}
+
+.unsupported {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.spacer {
+  display: inline-block;
+  width: 40px;
+}
+
+.spacer[data-outgoing] {
+  width: 62px;
+}
+
+.meta {
+  position: absolute;
+  right: 9px;
+  bottom: 5px;
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1;
+  user-select: none;
+}
+
+.row[data-direction='outgoing'] .meta {
+  color: var(--bubble-out-meta);
+}
+
+.status[data-status='read'] {
+  color: var(--meta-read);
+}
+
+.status[data-status='failed'] {
+  color: var(--danger);
+}
+
+.tail {
+  position: absolute;
+  bottom: 0;
+  fill: var(--bubble-bg);
+}
+
+.row[data-direction='outgoing'] .tail {
+  right: -8px;
+}
+
+.row[data-direction='incoming'] .tail {
+  left: -8px;
+  transform: scaleX(-1);
+}
+
+.failure {
+  margin: 4px 4px 0;
+  padding: 3px 10px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--bg-app) 88%, transparent);
+  color: var(--danger);
+  font-size: 13px;
+  backdrop-filter: blur(8px);
+}
+
+.retry {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.retry:hover {
+  text-decoration: underline;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.92);
+  }
+}

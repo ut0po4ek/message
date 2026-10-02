@@ -1,0 +1,167 @@
+:root {
+  --font:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --radius-bubble: 15px;
+  --shadow-bubble: 0 1px 2px rgb(16 35 47 / 15%);
+  --danger: #e53935;
+  --online: #4fae4e;
+  --sidebar-width: 400px;
+
+  color-scheme: light;
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.35;
+  -webkit-font-smoothing: antialiased;
+}
+
+:root,
+:root[data-messenger='telegram'] {
+  --accent: #3390ec;
+  --accent-hover: #1f7ed8;
+  --accent-contrast: #fff;
+  --bg-app: #fff;
+  --bg-header: #fff;
+  --bg-hover: #f4f4f5;
+  --bg-selected: #3390ec;
+  --text-selected: #fff;
+  --bg-input: #f4f4f5;
+  --text: #000;
+  --text-secondary: #707579;
+  --border: #dfe1e5;
+  --bubble-in: #fff;
+  --bubble-out: #eeffde;
+  --bubble-out-text: #000;
+  --bubble-out-meta: #4fae4e;
+  --meta-read: #4fae4e;
+  --chat-bg:
+    radial-gradient(circle at 15% 20%, #dbddbb 0, transparent 45%),
+    radial-gradient(circle at 85% 15%, #6ba587 0, transparent 50%),
+    radial-gradient(circle at 80% 85%, #d5d88d 0, transparent 50%),
+    radial-gradient(circle at 20% 90%, #88b884 0, transparent 55%), #b5c99a;
+  --login-bg: #fff;
+}
+
+:root[data-messenger='whatsapp'] {
+  --accent: #00a884;
+  --accent-hover: #008f72;
+  --accent-contrast: #fff;
+  --bg-app: #fff;
+  --bg-header: #f0f2f5;
+  --bg-hover: #f5f6f6;
+  --bg-selected: #f0f2f5;
+  --text-selected: #111b21;
+  --bg-input: #f0f2f5;
+  --text: #111b21;
+  --text-secondary: #667781;
+  --border: #e9edef;
+  --bubble-in: #fff;
+  --bubble-out: #d9fdd3;
+  --bubble-out-text: #111b21;
+  --bubble-out-meta: #667781;
+  --meta-read: #53bdeb;
+  --chat-bg: radial-gradient(rgb(0 0 0 / 4%) 1px, transparent 1px) 0 0 / 18px 18px, #efeae2;
+  --login-bg: #fcf5eb;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
+
+  :root,
+  :root[data-messenger='telegram'] {
+    --accent: #8774e1;
+    --accent-hover: #7563d1;
+    --bg-app: #212121;
+    --bg-header: #212121;
+    --bg-hover: #2c2c2c;
+    --bg-selected: #8774e1;
+    --bg-input: #2c2c2c;
+    --text: #fff;
+    --text-secondary: #aaa;
+    --border: #303030;
+    --bubble-in: #212121;
+    --bubble-out: #8774e1;
+    --bubble-out-text: #fff;
+    --bubble-out-meta: rgb(255 255 255 / 70%);
+    --meta-read: #fff;
+    --chat-bg:
+      radial-gradient(circle at 20% 25%, #2b2b45 0, transparent 50%),
+      radial-gradient(circle at 80% 75%, #1e3b37 0, transparent 50%), #0f0f0f;
+    --login-bg: #212121;
+  }
+
+  :root[data-messenger='whatsapp'] {
+    --bg-app: #111b21;
+    --bg-header: #202c33;
+    --bg-hover: #202c33;
+    --bg-selected: #2a3942;
+    --text-selected: #e9edef;
+    --bg-input: #2a3942;
+    --text: #e9edef;
+    --text-secondary: #8696a0;
+    --border: #222d34;
+    --bubble-in: #202c33;
+    --bubble-out: #005c4b;
+    --bubble-out-text: #e9edef;
+    --bubble-out-meta: rgb(233 237 239 / 60%);
+    --chat-bg: radial-gradient(rgb(255 255 255 / 3%) 1px, transparent 1px) 0 0 / 18px 18px, #0b141a;
+    --login-bg: #0b141a;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,107 @@
+.sidebar {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--bg-app);
+}
+
+.header {
+  display: flex;
+  height: 64px;
+  flex-shrink: 0;
+  gap: 12px;
+  align-items: center;
+  padding: 0 12px 0 16px;
+  background: var(--bg-header);
+}
+
+.account {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.status {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status::before {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--online);
+  content: '';
+}
+
+.status[data-status='connecting']::before,
+.status[data-status='reconnecting']::before {
+  background: #f0a020;
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+.iconButton {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-secondary);
+  place-items: center;
+  transition: background-color 0.15s;
+}
+
+.iconButton:hover {
+  background: var(--bg-hover);
+}
+
+.list {
+  flex: 1;
+  margin: 0;
+  padding: 0 8px 8px;
+  overflow-y: auto;
+  list-style: none;
+  scrollbar-width: thin;
+}
+
+.empty {
+  margin: auto;
+  padding: 24px 40px;
+  color: var(--text-secondary);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.empty p {
+  margin: 0;
+}
+
+.emptyTitle {
+  margin-bottom: 6px !important;
+  color: var(--text);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
