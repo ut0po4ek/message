@@ -1,9 +1,7 @@
 import type { MessengerId } from '../domain/types'
 import { MESSENGERS } from '../messengers'
 import styles from './MessengerSwitch.module.css'
-import { TelegramLogo, WhatsAppLogo } from './icons'
-
-const LOGOS = { telegram: TelegramLogo, whatsapp: WhatsAppLogo }
+import { MESSENGER_LOGOS } from './messengerLogos'
 
 interface MessengerSwitchProps {
   value: MessengerId
@@ -16,7 +14,7 @@ export function MessengerSwitch({ value, onChange, disabled }: MessengerSwitchPr
     <fieldset className={styles.switch} disabled={disabled}>
       <legend className="visually-hidden">Мессенджер</legend>
       {Object.values(MESSENGERS).map(({ id, name }) => {
-        const Logo = LOGOS[id]
+        const Logo = MESSENGER_LOGOS[id]
 
         return (
           <label key={id} className={styles.option}>

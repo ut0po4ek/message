@@ -4,7 +4,8 @@ import type { ConnectionStatus } from '../store/useNotificationPolling'
 import { ChatListItem } from './ChatListItem'
 import { NewChatForm } from './NewChatForm'
 import styles from './Sidebar.module.css'
-import { LogoutIcon, TelegramLogo, WhatsAppLogo } from './icons'
+import { LogoutIcon } from './icons'
+import { MESSENGER_LOGOS } from './messengerLogos'
 
 const CONNECTION_LABELS: Record<ConnectionStatus, string> = {
   connecting: 'Подключение…',
@@ -15,7 +16,7 @@ const CONNECTION_LABELS: Record<ConnectionStatus, string> = {
 export function Sidebar() {
   const { state, session, messenger, connection, selectChat, logout } = useChat()
   const chats = sortChats(state.chats)
-  const Logo = session.messenger === 'telegram' ? TelegramLogo : WhatsAppLogo
+  const Logo = MESSENGER_LOGOS[session.messenger]
 
   return (
     <aside className={styles.sidebar} aria-label="Чаты">

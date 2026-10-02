@@ -1,6 +1,7 @@
 .switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-inline-size: 0;
   gap: 4px;
   margin: 0;
   padding: 4px;
@@ -14,7 +15,8 @@
   gap: 8px;
   align-items: center;
   justify-content: center;
-  padding: 10px 12px;
+  min-width: 0;
+  padding: 10px 8px;
   border-radius: 9px;
   color: var(--text-secondary);
   font-weight: 500;
@@ -23,6 +25,10 @@
     background-color 0.15s,
     color 0.15s,
     box-shadow 0.15s;
+}
+
+.option svg {
+  flex-shrink: 0;
 }
 
 .option:hover {
@@ -43,4 +49,12 @@
 .switch:disabled .option {
   cursor: default;
   opacity: 0.6;
+}
+
+@media (max-width: 360px) {
+  .option {
+    gap: 4px;
+    padding-inline: 2px;
+    font-size: 14px;
+  }
 }

@@ -1,4 +1,4 @@
-export type MessengerId = 'telegram' | 'whatsapp'
+export type MessengerId = 'telegram' | 'whatsapp' | 'max'
 
 export interface Credentials {
   idInstance: string

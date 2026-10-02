@@ -7,7 +7,8 @@ import { MESSENGERS } from '../messengers'
 import { loadLastLogin } from '../store/persistence'
 import styles from './LoginScreen.module.css'
 import { MessengerSwitch } from './MessengerSwitch'
-import { AlertIcon, EyeIcon, TelegramLogo, WhatsAppLogo } from './icons'
+import { AlertIcon, EyeIcon } from './icons'
+import { MESSENGER_LOGOS } from './messengerLogos'
 
 const STATE_ERRORS: Record<Exclude<InstanceState, 'authorized'>, string> = {
   notAuthorized: 'Инстанс не авторизован. Привяжите аккаунт в личном кабинете GREEN-API',
@@ -46,7 +47,7 @@ export function LoginScreen({
   const formId = useId()
 
   const apiUrl = customApiUrl ?? (idInstance ? defaultApiUrl(idInstance) : '')
-  const Logo = messenger === 'telegram' ? TelegramLogo : WhatsAppLogo
+  const Logo = MESSENGER_LOGOS[messenger]
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()

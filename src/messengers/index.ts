@@ -23,7 +23,7 @@ const telegram: Messenger = {
     if (value.startsWith('@')) {
       if (!TELEGRAM_USERNAME.test(value)) throw new UserFacingError('Некорректный @username')
 
-      const account = await api.checkTelegramAccount({ username: value })
+      const account = await api.checkAccount({ username: value })
       if (!account.exist || !account.chatId) {
         throw new UserFacingError(`Пользователь ${value} не найден в Telegram`)
       }
@@ -32,7 +32,7 @@ const telegram: Messenger = {
     }
 
     const phone = requirePhone(value)
-    const account = await api.checkTelegramAccount({ phoneNumber: Number(phone) })
+    const account = await api.checkAccount({ phoneNumber: Number(phone) })
     if (!account.exist || !account.chatId) {
       throw new UserFacingError(
         'Пользователь не найден в Telegram или скрыл номер в настройках приватности. Попробуйте @username',
@@ -70,7 +70,30 @@ const whatsapp: Messenger = {
   },
 }
 
-export const MESSENGERS: Record<MessengerId, Messenger> = { telegram, whatsapp }
+// checkAccount в MAX принимает только номера России и Беларуси
+const MAX_PHONE = /^(7\d{10}|375\d{9})$/
+
+const max: Messenger = {
+  id: 'max',
+  name: 'MAX',
+  contactPlaceholder: 'Номер телефона (Россия или Беларусь)',
+
+  async resolveContact(api, input) {
+    const phone = requirePhone(input)
+    if (!MAX_PHONE.test(phone)) {
+      throw new UserFacingError('MAX поддерживает только номера России (+7) и Беларуси (+375)')
+    }
+
+    const account = await api.checkAccount({ phoneNumber: Number(phone) })
+    if (!account.exist || !account.chatId) {
+      throw new UserFacingError('Этот номер не зарегистрирован в MAX')
+    }
+
+    return { id: account.chatId, aliases: [], title: formatPhone(phone) }
+  },
+}
+
+export const MESSENGERS: Record<MessengerId, Messenger> = { telegram, whatsapp, max }
 
 function requirePhone(input: string): string {
   const phone = normalizePhone(input)

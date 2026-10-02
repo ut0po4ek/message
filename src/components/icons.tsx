@@ -1,6 +1,6 @@
-import type { SVGProps } from 'react'
+import { useId, type SVGProps } from 'react'
 
-type IconProps = SVGProps<SVGSVGElement> & { size?: number }
+export type IconProps = SVGProps<SVGSVGElement> & { size?: number }
 
 function Icon({ size = 24, children, ...props }: IconProps) {
   return (
@@ -109,6 +109,28 @@ export function TelegramLogo(props: IconProps) {
       <path
         fill="#fff"
         d="M5.4 11.8c3.5-1.5 5.8-2.5 7-3 3.3-1.4 4-1.6 4.5-1.6.1 0 .3 0 .5.2.1.1.2.3.2.4v.5c-.2 2-1 6.8-1.4 9-.2.9-.5 1.2-.9 1.3-.8.1-1.4-.5-2.2-1l-3-2c-1.3-.9-.5-1.4.3-2.2.2-.2 3.6-3.3 3.7-3.6 0 0 0-.2-.1-.2h-.3c-.1 0-2 1.3-5.6 3.7-.5.4-1 .5-1.4.5-.5 0-1.4-.3-2.1-.5-.8-.3-1.5-.4-1.4-.9 0-.3.4-.5 1-.7Z"
+      />
+    </Icon>
+  )
+}
+
+export function MaxLogo(props: IconProps) {
+  const gradientId = useId()
+
+  return (
+    <Icon {...props}>
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#3fb6ff" />
+          <stop offset="0.55" stopColor="#5a5cf5" />
+          <stop offset="1" stopColor="#9b3df0" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="12" fill={`url(#${gradientId})`} />
+      <path
+        fill="#fff"
+        fillRule="evenodd"
+        d="M12 5.5a6.5 6.5 0 0 0-5.7 9.63l-.78 2.86a.4.4 0 0 0 .5.49l2.86-.79A6.5 6.5 0 1 0 12 5.5Zm0 2.8a3.7 3.7 0 1 0 0 7.4 3.7 3.7 0 0 0 0-7.4Z"
       />
     </Icon>
   )

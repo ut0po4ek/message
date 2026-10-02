@@ -1,11 +1,11 @@
 import type { Credentials } from '../domain/types'
 import type {
+  CheckAccountResponse,
   CheckWhatsappResponse,
   DeleteNotificationResponse,
   Notification,
   SendMessageResponse,
   StateInstanceResponse,
-  TelegramCheckAccountResponse,
 } from './types'
 
 export class GreenApiError extends Error {
@@ -31,9 +31,7 @@ export interface GreenApi {
   sendMessage(chatId: string, message: string): Promise<SendMessageResponse>
   receiveNotification(receiveTimeoutSec: number, signal?: AbortSignal): Promise<Notification | null>
   deleteNotification(receiptId: number, signal?: AbortSignal): Promise<DeleteNotificationResponse>
-  checkTelegramAccount(
-    query: { phoneNumber: number } | { username: string },
-  ): Promise<TelegramCheckAccountResponse>
+  checkAccount(query: { phoneNumber: number } | { username: string }): Promise<CheckAccountResponse>
   checkWhatsapp(phoneNumber: number): Promise<CheckWhatsappResponse>
 }
 
@@ -82,8 +80,8 @@ export class GreenApiClient implements GreenApi {
     })
   }
 
-  checkTelegramAccount(query: { phoneNumber: number } | { username: string }) {
-    return this.#request<TelegramCheckAccountResponse>('checkAccount', {
+  checkAccount(query: { phoneNumber: number } | { username: string }) {
+    return this.#request<CheckAccountResponse>('checkAccount', {
       httpMethod: 'POST',
       body: query,
     })

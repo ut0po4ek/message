@@ -12,7 +12,7 @@ function createFakeApi() {
 
   const api = {
     getStateInstance: vi.fn().mockResolvedValue({ stateInstance: 'authorized' }),
-    checkTelegramAccount: vi.fn().mockResolvedValue({ exist: true, chatId: '10000000' }),
+    checkAccount: vi.fn().mockResolvedValue({ exist: true, chatId: '10000000' }),
     checkWhatsapp: vi.fn(),
     sendMessage: vi.fn().mockResolvedValue({ idMessage: 'OUT-1' }),
     deleteNotification: vi.fn().mockResolvedValue({ result: true }),
@@ -49,7 +49,7 @@ describe('App', () => {
 
     await user.type(await screen.findByPlaceholderText(/Номер телефона/), '+7 999 123-45-67')
     await user.click(screen.getByRole('button', { name: 'Создать чат' }))
-    expect(api.checkTelegramAccount).toHaveBeenCalledWith({ phoneNumber: 79991234567 })
+    expect(api.checkAccount).toHaveBeenCalledWith({ phoneNumber: 79991234567 })
 
     const composer = await screen.findByLabelText('Текст сообщения')
     await user.type(composer, 'Здравствуйте!{Enter}')
@@ -122,6 +122,44 @@ describe('App', () => {
 
     expect(api.checkWhatsapp).toHaveBeenCalledWith(79991234567)
     expect(await screen.findByRole('heading', { name: '+7 999 123-45-67' })).toBeInTheDocument()
+  })
+
+  it('switches to MAX and routes the reply into the created chat', async () => {
+    const user = userEvent.setup()
+    const { api, push } = createFakeApi()
+    api.checkAccount.mockResolvedValue({ exist: true, chatId: '10000000' })
+    render(<App createApi={() => api} />)
+
+    await user.click(screen.getByLabelText('MAX'))
+    expect(document.documentElement.dataset.messenger).toBe('max')
+    expect(screen.getByRole('heading', { name: 'MAX' })).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText('idInstance'), '3100000000')
+    await user.type(screen.getByLabelText('apiTokenInstance'), 'token123')
+    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://3100.api.green-api.com')
+    await user.click(screen.getByRole('button', { name: 'Войти' }))
+    await user.type(await screen.findByPlaceholderText(/Номер телефона/), '79991234567{Enter}')
+
+    expect(api.checkAccount).toHaveBeenCalledWith({ phoneNumber: 79991234567 })
+    expect(await screen.findByRole('heading', { name: '+7 999 123-45-67' })).toBeInTheDocument()
+
+    push({
+      typeWebhook: 'incomingMessageReceived',
+      timestamp: 1763115112,
+      idMessage: '1763115112345',
+      senderData: {
+        chatId: '10000000',
+        sender: '10000000',
+        chatName: 'Ходабрыш Пробешёлов',
+        senderName: 'Ходабрыш Пробешёлов',
+      },
+      messageData: {
+        typeMessage: 'textMessage',
+        textMessageData: { textMessage: 'Привет из MAX' },
+      },
+    })
+
+    expect(await within(screen.getByRole('log')).findByText('Привет из MAX')).toBeInTheDocument()
   })
 
   describe('with an active session', () => {

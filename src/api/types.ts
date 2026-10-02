@@ -9,7 +9,7 @@ export interface SendMessageResponse {
   idMessage: string
 }
 
-export interface TelegramCheckAccountResponse {
+export interface CheckAccountResponse {
   exist: boolean
   chatId?: string
   username?: string
