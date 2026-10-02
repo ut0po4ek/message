@@ -15,7 +15,7 @@ const createGreenApi = (credentials: Credentials) => new GreenApiClient(credenti
 export function App({ createApi = createGreenApi }: AppProps) {
   const [session, setSession] = useState<Session | null>(loadSession)
   const [messenger, setMessenger] = useState<MessengerId>(
-    () => session?.messenger ?? loadLastLogin()?.messenger ?? 'telegram',
+    () => session?.messenger ?? loadLastLogin()?.messenger ?? 'max',
   )
   const [notice, setNotice] = useState<string>()
 

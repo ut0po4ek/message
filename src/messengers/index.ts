@@ -15,7 +15,7 @@ const TELEGRAM_USERNAME = /^@[a-zA-Z][a-zA-Z0-9_]{3,31}$/
 const telegram: Messenger = {
   id: 'telegram',
   name: 'Telegram',
-  contactPlaceholder: 'Номер телефона или @username',
+  contactPlaceholder: 'Телефон или @username',
 
   async resolveContact(api, input) {
     const value = input.trim()
@@ -76,7 +76,7 @@ const MAX_PHONE = /^(7\d{10}|375\d{9})$/
 const max: Messenger = {
   id: 'max',
   name: 'MAX',
-  contactPlaceholder: 'Номер телефона (Россия или Беларусь)',
+  contactPlaceholder: 'Номер телефона (+7, +375)',
 
   async resolveContact(api, input) {
     const phone = requirePhone(input)
@@ -93,7 +93,7 @@ const max: Messenger = {
   },
 }
 
-export const MESSENGERS: Record<MessengerId, Messenger> = { telegram, whatsapp, max }
+export const MESSENGERS: Record<MessengerId, Messenger> = { max, telegram, whatsapp }
 
 function requirePhone(input: string): string {
   const phone = normalizePhone(input)

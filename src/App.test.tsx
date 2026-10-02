@@ -42,9 +42,10 @@ describe('App', () => {
     const { api, push } = createFakeApi()
     render(<App createApi={() => api} />)
 
-    await user.type(screen.getByLabelText('idInstance'), '4100000000')
+    expect(screen.getByRole('heading', { name: 'MAX' })).toBeInTheDocument()
+    await user.type(screen.getByLabelText('idInstance'), '3100000000')
     await user.type(screen.getByLabelText('apiTokenInstance'), 'token123')
-    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://4100.api.green-api.com')
+    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://3100.api.green-api.com')
     await user.click(screen.getByRole('button', { name: 'Войти' }))
 
     await user.type(await screen.findByPlaceholderText(/Номер телефона/), '+7 999 123-45-67')
@@ -124,42 +125,24 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: '+7 999 123-45-67' })).toBeInTheDocument()
   })
 
-  it('switches to MAX and routes the reply into the created chat', async () => {
+  it('switches the theme and contact lookup to Telegram', async () => {
     const user = userEvent.setup()
-    const { api, push } = createFakeApi()
-    api.checkAccount.mockResolvedValue({ exist: true, chatId: '10000000' })
+    const { api } = createFakeApi()
+    api.checkAccount.mockResolvedValue({ exist: true, chatId: '777' })
     render(<App createApi={() => api} />)
 
-    await user.click(screen.getByLabelText('MAX'))
-    expect(document.documentElement.dataset.messenger).toBe('max')
-    expect(screen.getByRole('heading', { name: 'MAX' })).toBeInTheDocument()
+    await user.click(screen.getByLabelText('Telegram'))
+    expect(document.documentElement.dataset.messenger).toBe('telegram')
+    expect(screen.getByRole('heading', { name: 'Telegram' })).toBeInTheDocument()
 
-    await user.type(screen.getByLabelText('idInstance'), '3100000000')
+    await user.type(screen.getByLabelText('idInstance'), '4100000000')
     await user.type(screen.getByLabelText('apiTokenInstance'), 'token123')
-    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://3100.api.green-api.com')
+    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://4100.api.green-api.com')
     await user.click(screen.getByRole('button', { name: 'Войти' }))
-    await user.type(await screen.findByPlaceholderText(/Номер телефона/), '79991234567{Enter}')
+    await user.type(await screen.findByPlaceholderText(/@username/), '@green_api{Enter}')
 
-    expect(api.checkAccount).toHaveBeenCalledWith({ phoneNumber: 79991234567 })
-    expect(await screen.findByRole('heading', { name: '+7 999 123-45-67' })).toBeInTheDocument()
-
-    push({
-      typeWebhook: 'incomingMessageReceived',
-      timestamp: 1763115112,
-      idMessage: '1763115112345',
-      senderData: {
-        chatId: '10000000',
-        sender: '10000000',
-        chatName: 'Ходабрыш Пробешёлов',
-        senderName: 'Ходабрыш Пробешёлов',
-      },
-      messageData: {
-        typeMessage: 'textMessage',
-        textMessageData: { textMessage: 'Привет из MAX' },
-      },
-    })
-
-    expect(await within(screen.getByRole('log')).findByText('Привет из MAX')).toBeInTheDocument()
+    expect(api.checkAccount).toHaveBeenCalledWith({ username: '@green_api' })
+    expect(await screen.findByRole('heading', { name: '@green_api' })).toBeInTheDocument()
   })
 
   describe('with an active session', () => {
