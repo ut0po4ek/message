@@ -4,6 +4,7 @@ import type { ConnectionStatus } from '../store/useNotificationPolling'
 import { ChatListItem } from './ChatListItem'
 import { NewChatForm } from './NewChatForm'
 import styles from './Sidebar.module.css'
+import { ThemeToggle } from './ThemeToggle'
 import { LogoutIcon } from './icons'
 import { MESSENGER_LOGOS } from './messengerLogos'
 
@@ -28,6 +29,7 @@ export function Sidebar() {
             {CONNECTION_LABELS[connection]} · {session.idInstance}
           </span>
         </div>
+        <ThemeToggle className={styles.iconButton} />
         <button type="button" className={styles.iconButton} onClick={logout} title="Выйти">
           <LogoutIcon size={22} />
           <span className="visually-hidden">Выйти</span>

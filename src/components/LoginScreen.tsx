@@ -7,6 +7,7 @@ import { MESSENGERS } from '../messengers'
 import { loadLastLogin } from '../store/persistence'
 import styles from './LoginScreen.module.css'
 import { MessengerSwitch } from './MessengerSwitch'
+import { ThemeToggle } from './ThemeToggle'
 import { AlertIcon, EyeIcon } from './icons'
 import { MESSENGER_LOGOS } from './messengerLogos'
 
@@ -92,6 +93,7 @@ export function LoginScreen({
 
   return (
     <main className={styles.screen}>
+      <ThemeToggle className={styles.themeToggle} />
       <div className={styles.card}>
         <Logo size={120} className={styles.logo} />
         <h1 className={styles.title}>{MESSENGERS[messenger].name}</h1>

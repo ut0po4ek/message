@@ -5,10 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
-      content="Веб-чат для отправки и получения сообщений Telegram и WhatsApp через GREEN-API"
+      content="Веб-чат для отправки и получения сообщений Telegram, WhatsApp и MAX через GREEN-API"
     />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>GREEN-API Chat</title>
+    <script>
+      // Тема до загрузки приложения, чтобы страница не мигала светлой темой
+      try {
+        const saved = localStorage.getItem('green-chat:theme')
+        const dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+      } catch {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

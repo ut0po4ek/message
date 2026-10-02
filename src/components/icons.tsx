@@ -50,6 +50,22 @@ export function LogoutIcon(props: IconProps) {
   )
 }
 
+export function SunIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10Zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0-8a1 1 0 0 1 1 1v1.5a1 1 0 1 1-2 0V2a1 1 0 0 1 1-1Zm0 18.5a1 1 0 0 1 1 1V22a1 1 0 1 1-2 0v-1.5a1 1 0 0 1 1-1ZM23 12a1 1 0 0 1-1 1h-1.5a1 1 0 1 1 0-2H22a1 1 0 0 1 1 1ZM4.5 12a1 1 0 0 1-1 1H2a1 1 0 1 1 0-2h1.5a1 1 0 0 1 1 1Zm14.9-7.4a1 1 0 0 1 0 1.4l-1.06 1.06a1 1 0 1 1-1.41-1.41L18 4.6a1 1 0 0 1 1.4 0ZM6.47 17.53a1 1 0 0 1 0 1.41L5.4 20a1 1 0 0 1-1.4-1.4l1.06-1.07a1 1 0 0 1 1.41 0ZM19.4 19.4a1 1 0 0 1-1.4 0l-1.07-1.06a1 1 0 0 1 1.41-1.41L19.4 18a1 1 0 0 1 0 1.4ZM6.47 6.47a1 1 0 0 1-1.41 0L4 5.4A1 1 0 0 1 5.4 4l1.07 1.06a1 1 0 0 1 0 1.41Z" />
+    </Icon>
+  )
+}
+
+export function MoonIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M10.2 2.6a1 1 0 0 1 .2 1.1 7.5 7.5 0 0 0 9.9 9.9 1 1 0 0 1 1.3 1.3A9.5 9.5 0 1 1 9.1 2.4a1 1 0 0 1 1.1.2ZM7.9 5.2a7.5 7.5 0 1 0 10.9 10.9A9.5 9.5 0 0 1 7.9 5.2Z" />
+    </Icon>
+  )
+}
+
 export function BackIcon(props: IconProps) {
   return (
     <Icon {...props}>
