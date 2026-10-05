@@ -48,6 +48,10 @@
   content: '';
 }
 
+.status[data-status='unavailable']::before {
+  background: var(--danger);
+}
+
 .status[data-status='connecting']::before,
 .status[data-status='reconnecting']::before {
   background: #f0a020;

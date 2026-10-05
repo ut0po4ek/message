@@ -5,6 +5,9 @@ import { SendIcon } from './icons'
 const MAX_LENGTH = 4000
 const COUNTER_FROM = 3500
 
+// На сенсорных экранах автофокус сразу открывает клавиатуру и закрывает переписку
+const canAutoFocus = () => window.matchMedia?.('(pointer: fine)').matches ?? true
+
 interface ComposerProps {
   onSend(text: string): void
 }
@@ -56,7 +59,7 @@ export function Composer({ onSend }: ComposerProps) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          autoFocus
+          autoFocus={canAutoFocus()}
         />
         {text.length >= COUNTER_FROM && (
           <span className={styles.counter} aria-live="polite">

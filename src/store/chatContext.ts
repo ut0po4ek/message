@@ -12,18 +12,30 @@ export interface ChatActions {
   logout(): void
 }
 
-export interface ChatContextValue extends ChatActions {
-  state: ChatState
+/** Не меняется за время сессии, поэтому его потребители не перерисовываются от уведомлений */
+export interface ChatSessionValue extends ChatActions {
   session: Session
   messenger: Messenger
+}
+
+export interface ChatStateValue {
+  state: ChatState
   connection: ConnectionStatus
 }
 
-export const ChatContext = createContext<ChatContextValue | null>(null)
+export const ChatSessionContext = createContext<ChatSessionValue | null>(null)
+export const ChatStateContext = createContext<ChatStateValue | null>(null)
 
-export function useChat(): ChatContextValue {
-  const value = useContext(ChatContext)
-  if (!value) throw new Error('useChat must be used inside <ChatProvider>')
+export function useChatSession(): ChatSessionValue {
+  const value = useContext(ChatSessionContext)
+  if (!value) throw new Error('useChatSession must be used inside <ChatProvider>')
+
+  return value
+}
+
+export function useChatState(): ChatStateValue {
+  const value = useContext(ChatStateContext)
+  if (!value) throw new Error('useChatState must be used inside <ChatProvider>')
 
   return value
 }

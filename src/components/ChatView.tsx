@@ -1,4 +1,4 @@
-import { useChat } from '../store/chatContext'
+import { useChatSession, useChatState } from '../store/chatContext'
 import { Avatar } from './Avatar'
 import styles from './ChatView.module.css'
 import { Composer } from './Composer'
@@ -6,7 +6,8 @@ import { MessageList } from './MessageList'
 import { BackIcon } from './icons'
 
 export function ChatView() {
-  const { state, messenger, selectChat, sendMessage, retryMessage } = useChat()
+  const { messenger, selectChat, sendMessage, retryMessage } = useChatSession()
+  const { state } = useChatState()
   const chat = state.activeChatId ? state.chats[state.activeChatId] : undefined
 
   if (!chat) {

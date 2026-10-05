@@ -3,10 +3,12 @@ import { isAuthError } from '../api/errors'
 import type { GreenApi } from '../api/greenApi'
 import type { NotificationBody } from '../api/types'
 
-export type ConnectionStatus = 'connecting' | 'online' | 'reconnecting'
+export type ConnectionStatus = 'connecting' | 'online' | 'unavailable' | 'reconnecting'
 
 const POLL_TIMEOUT_SEC = 20
 const MAX_BACKOFF_MS = 30_000
+/** Как часто перепроверять состояние инстанса: телефон может отключиться посреди сессии */
+const STATE_CHECK_MS = 60_000
 
 interface Handlers {
   onNotification(body: NotificationBody): void
@@ -29,14 +31,14 @@ export function useNotificationPolling(api: GreenApi, handlers: Handlers): Conne
 
     async function loop() {
       let failures = 0
-      let connected = false
+      let checkedAt = 0
 
       while (!signal.aborted) {
         try {
-          if (!connected) {
-            await api.getStateInstance(signal)
-            connected = true
-            setStatus('online')
+          if (Date.now() - checkedAt >= STATE_CHECK_MS) {
+            const { stateInstance } = await api.getStateInstance(signal)
+            checkedAt = Date.now()
+            setStatus(stateInstance === 'authorized' ? 'online' : 'unavailable')
           }
 
           const notification = await api.receiveNotification(POLL_TIMEOUT_SEC, signal)
@@ -52,7 +54,7 @@ export function useNotificationPolling(api: GreenApi, handlers: Handlers): Conne
             return
           }
 
-          connected = false
+          checkedAt = 0
           failures += 1
           setStatus('reconnecting')
           await sleep(Math.min(MAX_BACKOFF_MS, 1000 * 2 ** (failures - 1)), signal)

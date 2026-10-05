@@ -1,5 +1,5 @@
 import { sortChats } from '../domain/chatReducer'
-import { useChat } from '../store/chatContext'
+import { useChatSession, useChatState } from '../store/chatContext'
 import type { ConnectionStatus } from '../store/useNotificationPolling'
 import { ChatListItem } from './ChatListItem'
 import { NewChatForm } from './NewChatForm'
@@ -11,11 +11,13 @@ import { MESSENGER_LOGOS } from './messengerLogos'
 const CONNECTION_LABELS: Record<ConnectionStatus, string> = {
   connecting: 'Подключение…',
   online: 'В сети',
+  unavailable: 'Инстанс недоступен',
   reconnecting: 'Переподключение…',
 }
 
 export function Sidebar() {
-  const { state, session, messenger, connection, selectChat, logout } = useChat()
+  const { session, messenger, selectChat, logout } = useChatSession()
+  const { state, connection } = useChatState()
   const chats = sortChats(state.chats)
   const Logo = MESSENGER_LOGOS[session.messenger]
 

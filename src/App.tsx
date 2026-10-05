@@ -4,7 +4,7 @@ import { ChatScreen } from './components/ChatScreen'
 import { LoginScreen } from './components/LoginScreen'
 import type { Credentials, MessengerId, Session } from './domain/types'
 import { ChatProvider } from './store/ChatProvider'
-import { loadLastLogin, loadSession, saveLastLogin, saveSession } from './store/persistence'
+import { loadLastMessenger, loadSession, saveLastLogin, saveSession } from './store/persistence'
 
 interface AppProps {
   createApi?: (credentials: Credentials) => GreenApi
@@ -15,7 +15,7 @@ const createGreenApi = (credentials: Credentials) => new GreenApiClient(credenti
 export function App({ createApi = createGreenApi }: AppProps) {
   const [session, setSession] = useState<Session | null>(loadSession)
   const [messenger, setMessenger] = useState<MessengerId>(
-    () => session?.messenger ?? loadLastLogin()?.messenger ?? 'max',
+    () => session?.messenger ?? loadLastMessenger() ?? 'max',
   )
   const [notice, setNotice] = useState<string>()
 

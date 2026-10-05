@@ -5,7 +5,12 @@ import { chatReducer } from '../domain/chatReducer'
 import { parseNotification } from '../domain/notifications'
 import type { Message, Session } from '../domain/types'
 import { MESSENGERS } from '../messengers'
-import { ChatContext, type ChatActions, type ChatContextValue } from './chatContext'
+import {
+  ChatSessionContext,
+  ChatStateContext,
+  type ChatSessionValue,
+  type ChatStateValue,
+} from './chatContext'
 import { loadHistory, saveHistory } from './persistence'
 import { useNotificationPolling } from './useNotificationPolling'
 
@@ -22,7 +27,7 @@ export function ChatProvider({ session, api, onLogout, children }: ChatProviderP
   const [state, dispatch] = useReducer(chatReducer, session, loadHistory)
   const messenger = MESSENGERS[session.messenger]
 
-  useEffect(() => saveHistory(session, state), [session, state])
+  useEffect(() => saveHistory(session, state.chats), [session, state.chats])
 
   const connection = useNotificationPolling(api, {
     onNotification: (body) => dispatch({ type: 'eventReceived', event: parseNotification(body) }),
@@ -42,8 +47,11 @@ export function ChatProvider({ session, api, onLogout, children }: ChatProviderP
     [api, onLogout],
   )
 
-  const actions = useMemo<ChatActions>(
+  const sessionValue = useMemo<ChatSessionValue>(
     () => ({
+      session,
+      messenger,
+
       async openChat(contact) {
         const draft = await messenger.resolveContact(api, contact)
         dispatch({ type: 'chatOpened', draft, now: Date.now() })
@@ -74,13 +82,14 @@ export function ChatProvider({ session, api, onLogout, children }: ChatProviderP
         onLogout()
       },
     }),
-    [api, messenger, deliver, onLogout],
+    [api, session, messenger, deliver, onLogout],
   )
 
-  const value = useMemo<ChatContextValue>(
-    () => ({ ...actions, state, session, messenger, connection }),
-    [actions, state, session, messenger, connection],
-  )
+  const stateValue = useMemo<ChatStateValue>(() => ({ state, connection }), [state, connection])
 
-  return <ChatContext value={value}>{children}</ChatContext>
+  return (
+    <ChatSessionContext value={sessionValue}>
+      <ChatStateContext value={stateValue}>{children}</ChatStateContext>
+    </ChatSessionContext>
+  )
 }

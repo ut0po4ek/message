@@ -195,6 +195,64 @@ describe('chatReducer', () => {
 
       expect(state.chats['10000000'].messages[0].status).toBe('read')
     })
+
+    const statusEvent = (status: 'delivered' | 'read') =>
+      ({
+        type: 'eventReceived',
+        event: { type: 'status', chatId: '10000000', messageId: 'SRV1', status },
+      }) as const
+
+    it('applies a status that arrived before the send response', () => {
+      let state = queued(opened(initialChatState, '10000000'), '10000000')
+      state = chatReducer(state, statusEvent('delivered'))
+      state = chatReducer(state, statusEvent('read'))
+      state = chatReducer(state, {
+        type: 'messageSent',
+        chatId: '10000000',
+        localId: 'local-1',
+        messageId: 'SRV1',
+      })
+
+      expect(state.chats['10000000'].messages).toEqual([
+        expect.objectContaining({ id: 'SRV1', status: 'read' }),
+      ])
+      expect(state.earlyStatuses).toEqual({})
+    })
+
+    it('applies an early status to the API notification of the message', () => {
+      let state = opened(initialChatState, '10000000')
+      state = chatReducer(state, statusEvent('delivered'))
+      state = chatReducer(state, {
+        type: 'eventReceived',
+        event: {
+          type: 'message',
+          chatId: '10000000',
+          message: {
+            id: 'SRV1',
+            direction: 'outgoing',
+            text: 'Привет',
+            timestamp: NOW,
+            status: 'sent',
+          },
+        },
+      })
+
+      expect(state.chats['10000000'].messages[0].status).toBe('delivered')
+      expect(state.earlyStatuses).toEqual({})
+    })
+
+    it('keeps a bounded number of statuses for unknown messages', () => {
+      let state = opened(initialChatState, '10000000')
+      for (let i = 0; i < 150; i++) {
+        state = chatReducer(state, {
+          type: 'eventReceived',
+          event: { type: 'status', chatId: '10000000', messageId: `OLD${i}`, status: 'read' },
+        })
+      }
+
+      expect(Object.keys(state.earlyStatuses)).toHaveLength(100)
+      expect(state.earlyStatuses.OLD149).toEqual({ status: 'read', error: undefined })
+    })
   })
 
   it('sorts chats by last activity', () => {

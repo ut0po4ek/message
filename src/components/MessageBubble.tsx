@@ -51,7 +51,7 @@ export function MessageBubble({
       </div>
 
       {failed && (
-        <p className={styles.failure} role="alert">
+        <p className={styles.failure}>
           {message.error ?? 'Не удалось отправить'}
           {' · '}
           <button type="button" className={styles.retry} onClick={() => onRetry(message)}>

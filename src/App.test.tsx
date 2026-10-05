@@ -145,6 +145,28 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: '@green_api' })).toBeInTheDocument()
   })
 
+  it('remembers the last instance separately for each messenger', async () => {
+    const user = userEvent.setup()
+    const { api } = createFakeApi()
+    render(<App createApi={() => api} />)
+
+    await user.type(screen.getByLabelText('idInstance'), '3100000000')
+    await user.type(screen.getByLabelText('apiTokenInstance'), 'token123')
+    await user.click(screen.getByRole('button', { name: 'Войти' }))
+    await user.click(await screen.findByRole('button', { name: 'Выйти' }))
+
+    expect(screen.getByLabelText('idInstance')).toHaveValue('3100000000')
+    await user.click(screen.getByLabelText('WhatsApp'))
+    expect(screen.getByLabelText('idInstance')).toHaveValue('')
+
+    await user.type(screen.getByLabelText('idInstance'), '1103000000')
+    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://1103.api.green-api.com')
+
+    await user.click(screen.getByLabelText('MAX'))
+    expect(screen.getByLabelText('idInstance')).toHaveValue('3100000000')
+    expect(screen.getByLabelText('apiUrl')).toHaveValue('https://3100.api.green-api.com')
+  })
+
   describe('with an active session', () => {
     const session = {
       messenger: 'telegram',
@@ -163,6 +185,52 @@ describe('App', () => {
         'Ключи доступа больше не действуют',
       )
       expect(sessionStorage.getItem('green-chat:session')).toBeNull()
+    })
+
+    it('shows unread count in the tab title and restores it after logout', async () => {
+      document.title = 'GREEN-API Chat'
+      sessionStorage.setItem('green-chat:session', JSON.stringify(session))
+      const user = userEvent.setup()
+      const { api, push } = createFakeApi()
+      render(<App createApi={() => api} />)
+
+      push({
+        typeWebhook: 'incomingMessageReceived',
+        idMessage: 'IN-1',
+        timestamp: 1763115112,
+        senderData: { chatId: '20000000', senderName: 'Анна' },
+        messageData: { typeMessage: 'textMessage', textMessageData: { textMessage: 'Привет' } },
+      })
+      await waitFor(() => expect(document.title).toBe('(1) Telegram'))
+
+      await user.click(screen.getByRole('button', { name: 'Выйти' }))
+      expect(document.title).toBe('GREEN-API Chat')
+    })
+
+    it('warns when the instance is not authorized', async () => {
+      sessionStorage.setItem('green-chat:session', JSON.stringify(session))
+      const { api } = createFakeApi()
+      api.getStateInstance.mockResolvedValue({ stateInstance: 'notAuthorized' })
+      render(<App createApi={() => api} />)
+
+      expect(await screen.findByText(/Инстанс недоступен/)).toBeInTheDocument()
+      expect(screen.queryByText(/В сети/)).not.toBeInTheDocument()
+    })
+
+    it('notices when the instance stops being authorized mid-session', async () => {
+      sessionStorage.setItem('green-chat:session', JSON.stringify(session))
+      const { api, push } = createFakeApi()
+      render(<App createApi={() => api} />)
+      expect(await screen.findByText(/В сети/)).toBeInTheDocument()
+
+      api.getStateInstance.mockResolvedValue({ stateInstance: 'sleepMode' })
+      const clock = vi.spyOn(Date, 'now').mockReturnValue(Date.now() + 61_000)
+      try {
+        push({ typeWebhook: 'stateInstanceChanged' })
+        expect(await screen.findByText(/Инстанс недоступен/)).toBeInTheDocument()
+      } finally {
+        clock.mockRestore()
+      }
     })
 
     it('reconnects after a network failure', async () => {

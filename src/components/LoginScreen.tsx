@@ -4,7 +4,7 @@ import { defaultApiUrl, type GreenApi } from '../api/greenApi'
 import type { InstanceState } from '../api/types'
 import type { Credentials, MessengerId, Session } from '../domain/types'
 import { MESSENGERS } from '../messengers'
-import { loadLastLogin } from '../store/persistence'
+import { loadSavedInstance } from '../store/persistence'
 import styles from './LoginScreen.module.css'
 import { MessengerSwitch } from './MessengerSwitch'
 import { ThemeToggle } from './ThemeToggle'
@@ -37,10 +37,10 @@ export function LoginScreen({
   onLogin,
   notice,
 }: LoginScreenProps) {
-  const [lastLogin] = useState(loadLastLogin)
-  const [idInstance, setIdInstance] = useState(lastLogin?.idInstance ?? '')
+  const [saved] = useState(() => savedFields(messenger))
+  const [idInstance, setIdInstance] = useState(saved.idInstance)
   const [apiTokenInstance, setApiTokenInstance] = useState('')
-  const [customApiUrl, setCustomApiUrl] = useState<string | null>(lastLogin?.apiUrl ?? null)
+  const [customApiUrl, setCustomApiUrl] = useState(saved.customApiUrl)
   const [showToken, setShowToken] = useState(false)
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | undefined>(notice)
@@ -49,6 +49,16 @@ export function LoginScreen({
 
   const apiUrl = customApiUrl ?? (idInstance ? defaultApiUrl(idInstance) : '')
   const Logo = MESSENGER_LOGOS[messenger]
+
+  function handleMessengerChange(next: MessengerId) {
+    const fields = savedFields(next)
+    setIdInstance(fields.idInstance)
+    setCustomApiUrl(fields.customApiUrl)
+    setApiTokenInstance('')
+    setFieldErrors({})
+    setError(undefined)
+    onMessengerChange(next)
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -105,7 +115,7 @@ export function LoginScreen({
         </p>
 
         <form className={styles.form} onSubmit={handleSubmit} noValidate>
-          <MessengerSwitch value={messenger} onChange={onMessengerChange} disabled={pending} />
+          <MessengerSwitch value={messenger} onChange={handleMessengerChange} disabled={pending} />
 
           <div className={styles.field}>
             <input
@@ -185,6 +195,17 @@ export function LoginScreen({
       </div>
     </main>
   )
+}
+
+/** Данные последнего входа в этот мессенджер; apiUrl считается своим, только если он отличается от адреса по умолчанию */
+function savedFields(messenger: MessengerId): { idInstance: string; customApiUrl: string | null } {
+  const saved = loadSavedInstance(messenger)
+  if (!saved) return { idInstance: '', customApiUrl: null }
+
+  return {
+    idInstance: saved.idInstance,
+    customApiUrl: saved.apiUrl === defaultApiUrl(saved.idInstance) ? null : saved.apiUrl,
+  }
 }
 
 function validate({ idInstance, apiTokenInstance, apiUrl }: Credentials): FieldErrors {

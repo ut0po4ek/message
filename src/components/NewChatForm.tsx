@@ -1,14 +1,15 @@
-import { useState, type FormEvent } from 'react'
+import { useId, useState, type FormEvent } from 'react'
 import { describeError } from '../api/errors'
-import { useChat } from '../store/chatContext'
+import { useChatSession } from '../store/chatContext'
 import styles from './NewChatForm.module.css'
 import { PlusIcon } from './icons'
 
 export function NewChatForm() {
-  const { messenger, openChat } = useChat()
+  const { messenger, openChat } = useChatSession()
   const [contact, setContact] = useState('')
   const [pending, setPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const errorId = useId()
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -36,7 +37,7 @@ export function NewChatForm() {
           placeholder={messenger.contactPlaceholder}
           aria-label={messenger.contactPlaceholder}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? 'new-chat-error' : undefined}
+          aria-describedby={error ? errorId : undefined}
           value={contact}
           onChange={(e) => {
             setContact(e.target.value)
@@ -55,7 +56,7 @@ export function NewChatForm() {
         </button>
       </div>
       {error && (
-        <p id="new-chat-error" className={styles.error} role="alert">
+        <p id={errorId} className={styles.error} role="alert">
           {error}
         </p>
       )}

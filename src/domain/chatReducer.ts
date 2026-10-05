@@ -2,9 +2,19 @@ import type { ChatEvent } from './notifications'
 import { describeChatId } from './phone'
 import type { Chat, ChatDraft, Message, MessageStatus } from './types'
 
+interface EarlyStatus {
+  status: MessageStatus
+  error?: string
+}
+
 export interface ChatState {
   chats: Record<string, Chat>
   activeChatId: string | null
+  /**
+   * Статусы, пришедшие раньше ответа sendMessage: сообщение ещё хранится под локальным id.
+   * Применяются, когда сообщение получает свой idMessage.
+   */
+  earlyStatuses: Record<string, EarlyStatus>
 }
 
 export type ChatAction =
@@ -16,7 +26,9 @@ export type ChatAction =
   | { type: 'messageRetried'; chatId: string; localId: string; now: number }
   | { type: 'eventReceived'; event: ChatEvent }
 
-export const initialChatState: ChatState = { chats: {}, activeChatId: null }
+export const initialChatState: ChatState = { chats: {}, activeChatId: null, earlyStatuses: {} }
+
+const MAX_EARLY_STATUSES = 100
 
 const STATUS_RANK: Record<MessageStatus, number> = {
   failed: -1,
@@ -36,6 +48,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       if (!chat) return { ...state, activeChatId: null }
 
       return {
+        ...state,
         chats: chat.unreadCount ? putChat(state.chats, { ...chat, unreadCount: 0 }) : state.chats,
         activeChatId: chat.id,
       }
@@ -48,8 +61,12 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
       }))
 
     case 'messageSent':
-      return updateChat(state, action.chatId, (chat) =>
-        confirmMessage(chat, action.localId, action.messageId),
+      return applyEarlyStatus(
+        updateChat(state, action.chatId, (chat) =>
+          confirmMessage(chat, action.localId, action.messageId),
+        ),
+        action.chatId,
+        action.messageId,
       )
 
     case 'messageFailed':
@@ -72,7 +89,7 @@ export function chatReducer(state: ChatState, action: ChatAction): ChatState {
   }
 }
 
-export function findChatKey(state: ChatState, chatIds: string[]): string | undefined {
+function findChatKey(state: ChatState, chatIds: string[]): string | undefined {
   const direct = chatIds.find((id) => id in state.chats)
   if (direct) return direct
 
@@ -110,7 +127,7 @@ function openChat(state: ChatState, draft: ChatDraft, now: number): ChatState {
         createdAt: now,
       }
 
-  return { chats: putChat(state.chats, chat), activeChatId: chat.id }
+  return { ...state, chats: putChat(state.chats, chat), activeChatId: chat.id }
 }
 
 function applyEvent(state: ChatState, event: ChatEvent): ChatState {
@@ -120,7 +137,8 @@ function applyEvent(state: ChatState, event: ChatEvent): ChatState {
     const key =
       findChatKey(state, [event.chatId]) ??
       Object.values(state.chats).find((c) => c.messages.some((m) => m.id === event.messageId))?.id
-    if (!key) return state
+    const known = key && state.chats[key].messages.some((m) => m.id === event.messageId)
+    if (!known) return rememberEarlyStatus(state, event.messageId, event.status, event.error)
 
     return updateMessage(state, key, event.messageId, (message) =>
       nextStatus(message, event.status, event.error),
@@ -145,7 +163,7 @@ function applyEvent(state: ChatState, event: ChatEvent): ChatState {
   const isUnread = event.message.direction === 'incoming' && state.activeChatId !== chat.id
   const rename = !chat.hasName && event.chatName
 
-  return {
+  const next = {
     ...state,
     chats: putChat(state.chats, {
       ...chat,
@@ -158,6 +176,40 @@ function applyEvent(state: ChatState, event: ChatEvent): ChatState {
       unreadCount: chat.unreadCount + (isUnread ? 1 : 0),
     }),
   }
+
+  return applyEarlyStatus(next, chat.id, event.message.id)
+}
+
+function rememberEarlyStatus(
+  state: ChatState,
+  messageId: string,
+  status: MessageStatus,
+  error?: string,
+): ChatState {
+  const previous = state.earlyStatuses[messageId]
+  if (
+    previous &&
+    previous.status !== 'failed' &&
+    STATUS_RANK[previous.status] >= STATUS_RANK[status]
+  ) {
+    return state
+  }
+
+  const entries = Object.entries({ ...state.earlyStatuses, [messageId]: { status, error } })
+
+  return { ...state, earlyStatuses: Object.fromEntries(entries.slice(-MAX_EARLY_STATUSES)) }
+}
+
+function applyEarlyStatus(state: ChatState, chatKey: string, messageId: string): ChatState {
+  const early = state.earlyStatuses[messageId]
+  if (!early) return state
+
+  const { [messageId]: _, ...earlyStatuses } = state.earlyStatuses
+  const next = updateMessage(state, chatKey, messageId, (message) =>
+    nextStatus(message, early.status, early.error),
+  )
+
+  return { ...next, earlyStatuses }
 }
 
 function confirmMessage(chat: Chat, localId: string, messageId: string): Chat {
